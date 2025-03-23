@@ -6,7 +6,8 @@ import 'package:hava_havai/logic/events/cart_event.dart';
 import 'package:hava_havai/logic/states/cart_state.dart';
 
 class CartScreen extends StatelessWidget {
-  int totalitem = 0;
+  int totalItem = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,15 +75,21 @@ class CartScreen extends StatelessWidget {
                                               fontWeight: FontWeight.bold),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        Align(
-                                            alignment: Alignment.topRight,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                context.read<CartBloc>().add(
-                                                    RemoveFromCart(product));
-                                              },
-                                              icon: Icon(Icons.delete),
-                                            ))
+                                        BlocBuilder<CartBloc, CartState>(
+                                          builder: (context, state) {
+                                            return Align(
+                                                alignment: Alignment.topRight,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    context
+                                                        .read<CartBloc>()
+                                                        .add(RemoveFromCart(
+                                                            product));
+                                                  },
+                                                  icon: Icon(Icons.delete),
+                                                ));
+                                          },
+                                        )
                                       ],
                                     ),
                                     Text(
@@ -168,8 +175,6 @@ class CartScreen extends StatelessWidget {
                     },
                   ),
                 ),
-
-
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
@@ -224,7 +229,6 @@ class CartScreen extends StatelessWidget {
                               ],
                             ),
                             style: ElevatedButton.styleFrom(
-                              
                               backgroundColor: Colors.pink, // Button color
                               foregroundColor: Colors.white, // Text color
                               padding: EdgeInsets.symmetric(

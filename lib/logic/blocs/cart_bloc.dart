@@ -10,42 +10,68 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<IncreaseQuantity>(_onIncreaseQuantity);
     on<DecreaseQuantity>(_onDecreaseQuantity);
   }
+
   void _onAddToCart(AddToCart event, Emitter<CartState> emit) {
     final cartItems = Map<Product, int>.from(state.cartItems);
+    final isCheckedMap = Map<int, bool>.from(state.isCheckedMap);
+
     if (cartItems.containsKey(event.product)) {
       cartItems[event.product] = cartItems[event.product]! + 1;
     } else {
       cartItems[event.product] = 1;
+      isCheckedMap[event.product.id] = true; // Mark item as checked
     }
-    emit(CartState(
-        cartItems: cartItems, totalPrice: _calculateTotal(cartItems)));
+
+    emit(state.copyWith(
+      cartItems: cartItems,
+      isCheckedMap: isCheckedMap,
+      totalPrice: _calculateTotal(cartItems),
+    ));
   }
 
   void _onRemoveFromCart(RemoveFromCart event, Emitter<CartState> emit) {
     final cartItems = Map<Product, int>.from(state.cartItems);
+    final isCheckedMap = Map<int, bool>.from(state.isCheckedMap);
+
     cartItems.remove(event.product);
-    emit(CartState(
-        cartItems: cartItems, totalPrice: _calculateTotal(cartItems)));
+    isCheckedMap.remove(event.product.id); // Remove from checked map
+
+    emit(state.copyWith(
+      cartItems: cartItems,
+      isCheckedMap: isCheckedMap,
+      totalPrice: _calculateTotal(cartItems),
+    ));
   }
 
   void _onIncreaseQuantity(IncreaseQuantity event, Emitter<CartState> emit) {
     final cartItems = Map<Product, int>.from(state.cartItems);
+
     if (cartItems.containsKey(event.product)) {
       cartItems[event.product] = cartItems[event.product]! + 1;
     }
-    emit(CartState(
-        cartItems: cartItems, totalPrice: _calculateTotal(cartItems)));
+
+    emit(state.copyWith(
+      cartItems: cartItems,
+      totalPrice: _calculateTotal(cartItems),
+    ));
   }
 
   void _onDecreaseQuantity(DecreaseQuantity event, Emitter<CartState> emit) {
     final cartItems = Map<Product, int>.from(state.cartItems);
+    final isCheckedMap = Map<int, bool>.from(state.isCheckedMap);
+
     if (cartItems.containsKey(event.product) && cartItems[event.product]! > 1) {
       cartItems[event.product] = cartItems[event.product]! - 1;
     } else {
       cartItems.remove(event.product);
+      isCheckedMap.remove(event.product.id); // Remove from checked map
     }
-    emit(CartState(
-        cartItems: cartItems, totalPrice: _calculateTotal(cartItems)));
+
+    emit(state.copyWith(
+      cartItems: cartItems,
+      isCheckedMap: isCheckedMap,
+      totalPrice: _calculateTotal(cartItems),
+    ));
   }
 
   double _calculateTotal(Map<Product, int> cartItems) {

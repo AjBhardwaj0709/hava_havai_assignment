@@ -5,6 +5,8 @@ abstract class CartEvent {}
 class AddToCart extends CartEvent {
   final Product product;
   AddToCart(this.product);
+   @override
+  List<Object> get props => [product];
 }
 
 class RemoveFromCart extends CartEvent {
