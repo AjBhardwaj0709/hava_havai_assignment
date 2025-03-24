@@ -9,16 +9,11 @@ import 'package:hava_havai/logic/blocs/product_bloc.dart';
 import 'package:hava_havai/logic/events/product_event.dart';
 import 'package:hava_havai/presentation/screens/catalog_screen.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
+void main() {
+  runApp(const MyApp());
+}
 
-void main() => runApp(
-      DevicePreview(
-        enabled: !kReleaseMode,
-        builder: (context) => MyApp(), // Wrap your app
-      ),
-    );
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
