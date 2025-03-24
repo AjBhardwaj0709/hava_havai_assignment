@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hava_havai/logic/blocs/cart_bloc.dart';
+import 'package:hava_havai/logic/blocs/like_bloc.dart';
 import 'package:hava_havai/logic/blocs/product_bloc.dart';
 import 'package:hava_havai/logic/events/cart_event.dart';
 import 'package:hava_havai/logic/events/product_event.dart';
 import 'package:hava_havai/logic/states/cart_state.dart';
+import 'package:hava_havai/logic/states/like_state.dart';
 import 'package:hava_havai/logic/states/product_state.dart';
 import 'package:hava_havai/presentation/screens/cart_screen.dart';
+import 'package:hava_havai/presentation/screens/liked_items_page.dart';
+import 'package:hava_havai/presentation/screens/product_detail_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
   @override
@@ -65,36 +69,82 @@ class _CatalogScreenState extends State<CatalogScreen> {
         backgroundColor: const Color.fromARGB(255, 251, 227, 235),
         title: Center(child: Text("Catalogue")),
         actions: [
-          Stack(
+          Row(
             children: [
-              IconButton(
-                icon: Icon(Icons.shopping_cart_outlined, size: 30),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CartScreen()));
-                },
-              ),
-              Positioned(
-                right: 5,
-                top: 5,
-                child: BlocBuilder<CartBloc, CartState>(
-                  builder: (context, state) {
-                    if (state.cartItems.isNotEmpty) {
-                      return CircleAvatar(
-                        backgroundColor: Colors.red,
-                        radius: 10,
-                        child: Text(
-                          state.cartItems.length.toString(),
-                          style: TextStyle(fontSize: 12, color: Colors.white),
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.favorite, color: Colors.pink),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LikedItemsPage(
+                            likedProducts:
+                                context.read<LikeBloc>().state.likedProducts,
+                          ),
                         ),
                       );
-                    }
-                    return SizedBox.shrink();
-                  },
-                ),
+                    },
+                  ),
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: BlocBuilder<LikeBloc, LikeState>(
+                      builder: (context, state) {
+                        if (state.likedProducts.isNotEmpty) {
+                          return CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 10,
+                            child: Text(
+                              state.likedProducts.length.toString(),
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          );
+                        }
+                        return SizedBox.shrink();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 10), // Add spacing between icons
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.shopping_cart_outlined, size: 30),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CartScreen()),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: BlocBuilder<CartBloc, CartState>(
+                      builder: (context, state) {
+                        if (state.cartItems.isNotEmpty) {
+                          return CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 10,
+                            child: Text(
+                              state.cartItems.length.toString(),
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          );
+                        }
+                        return SizedBox.shrink();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
-          )
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(7),
@@ -120,7 +170,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       child: GridView.builder(
                         controller: _scrollController,
                         shrinkWrap: true,
-                        
+
                         physics: AlwaysScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
@@ -153,14 +203,26 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(10)),
-                                      child: Image.network(
-                                        product.thumbnail,
-                                        width: double.infinity,
-                                        height: 150,
-                                        fit: BoxFit.cover,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductDetailScreen(
+                                                      product: product),
+                                            ),
+                                          );
+                                        },
+                                        child: Image.network(
+                                          product.thumbnail,
+                                          width: double.infinity,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
-                                   Positioned(
+                                    Positioned(
                                       right: 10,
                                       top: 110,
                                       child: BlocBuilder<CartBloc, CartState>(
@@ -214,7 +276,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         },
                                       ),
                                     ),
-
                                   ],
                                 ),
                                 Padding(
